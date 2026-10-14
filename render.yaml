@@ -1,0 +1,36 @@
+services:
+  # Sahayak Backend API Web Service
+  - type: web
+    name: sahayak-api
+    runtime: node
+    rootDir: backend
+    plan: free
+    buildCommand: npm install && npx prisma generate && npm run build
+    startCommand: node dist/index.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: sahayak-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DATA_KEY
+        generateValue: true
+      - key: HASH_KEY
+        generateValue: true
+      - key: CORS_ORIGIN
+        value: https://sahayak.vercel.app
+      - key: GEMINI_MODEL
+        value: gemini-2.5-flash
+      - key: GEMINI_API_KEY
+        sync: false
+
+databases:
+  # Managed PostgreSQL Database for Sahayak
+  - name: sahayak-db
+    plan: free
+    databaseName: sahayak
+    user: sahayak
